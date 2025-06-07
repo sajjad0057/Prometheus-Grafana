@@ -1,0 +1,6 @@
+@ShopMetrics.API_HostAddress = http://localhost:5087
+
+GET {{ShopMetrics.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
