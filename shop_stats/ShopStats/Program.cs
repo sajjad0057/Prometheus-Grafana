@@ -1,25 +1,39 @@
+using Mapster;
+using Microsoft.EntityFrameworkCore;
+using Prometheus;
+using ShopStats;
+using ShopStats.Contexts;
+using ShopStats.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(builder.Configuration.GetConnectionString("Default"),
+        new MySqlServerVersion(new Version(8, 0, 42))));
+
+builder.Services.AddMapster();
+
+builder.Services.AddScoped<ISaleService, SaleService>();
+builder.Services.AddScoped<IShopService, ShopService>();
+
+//MappingConfig.RegisterMappings();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseHttpMetrics();
+app.UseMetricServer();
 
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
+
